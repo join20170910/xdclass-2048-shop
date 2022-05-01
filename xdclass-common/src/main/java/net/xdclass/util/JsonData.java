@@ -57,7 +57,6 @@ public class JsonData {
         return new JsonData(-1, null, msg);
     }
 
-
     /**
      * 自定义状态码和错误信息
      * @param code
