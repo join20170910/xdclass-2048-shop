@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author john
  * @since 2022-05-01
  */
-public interface AddressService extends IService<AddressDO> {
-
+public interface IAddressService extends IService<AddressDO> {
+    AddressDO detail(Long id);
 }
