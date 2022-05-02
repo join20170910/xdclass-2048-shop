@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class NotifyServiceImpl implements INotifyService {
 
     private final String SUBJECT = "注册验证码";
-    private final String CONTENT ="您的验证码是%s,有效时间是60秒,打死也不要告诉别人!";
+    private final String CONTENT ="您的验证码是%s,有效时间是十分钟,打死也不要告诉别人!";
     private final int CODE_EXPIRED = 60 *1000 * 10;
     @Autowired
     private IMailService mailService;

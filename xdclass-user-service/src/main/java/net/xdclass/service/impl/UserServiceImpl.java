@@ -1,20 +1,25 @@
 package net.xdclass.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.enums.BizCodeEnum;
 import net.xdclass.enums.SendCodeEnum;
 import net.xdclass.mapper.UserMapper;
 import net.xdclass.model.UserDO;
+import net.xdclass.request.UserLoginRequest;
 import net.xdclass.request.UserRegisterRequest;
 import net.xdclass.service.INotifyService;
 import net.xdclass.service.IUserService;
+import net.xdclass.util.CommonUtil;
 import net.xdclass.util.JsonData;
+import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -43,27 +48,51 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             JsonData.buildResult(BizCodeEnum.CODE_ERROR);
         }
         UserDO userDO = new UserDO();
+        BeanUtils.copyProperties(userRegisterRequest,userDO);
         userDO.setCreateTime(new Date());
         userDO.setSlogan("hello word");
         //密码 TODO
-        userDO.setPwd("");
-        BeanUtils.copyProperties(userRegisterRequest,userDO);
+        // 生成秘钥 盐
+        userDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8));
+        String cryptPwd = Md5Crypt.md5Crypt(userDO.getPwd().getBytes(), userDO.getSecret());
+        userDO.setPwd(cryptPwd);
+
+
         //账号唯一性检查 TODO
         if (checkUnique(userRegisterRequest.getMail())){
             int rows = userMapper.insert(userDO);
             log.info("用户注册成功影响行rows:[{}],注册用户信息[{}]",rows,userDO);
             // 新用户注册成功 初始化信息, 发放福利 TODO
             userRegisterInitTask(userDO);
-            JsonData.buildSuccess();
+            return JsonData.buildSuccess();
         }else {
-            JsonData.buildResult(BizCodeEnum.ACCOUNT_REPEAT);
+            return JsonData.buildResult(BizCodeEnum.ACCOUNT_REPEAT);
         }
+    }
 
+    @Override
+    public JsonData login(UserLoginRequest loginRequest) {
+
+        UserDO userDO = userMapper.selectOne(new QueryWrapper<UserDO>().eq("mail", loginRequest.getMail()));
+        if (userDO != null ){
+            String pwd = userDO.getPwd();
+            String crypt = Md5Crypt.md5Crypt(loginRequest.getPwd().getBytes(), userDO.getSecret());
+            if (pwd.equals(crypt)){
+                return JsonData.buildSuccess();
+            }
+        }else {
+            JsonData.buildResult(BizCodeEnum.ACCOUNT_UNREGISTER);
+        }
         return null;
     }
 
     private boolean checkUnique(String mail) {
-        return false;
+        List<UserDO> userList = userMapper.selectList(new QueryWrapper<UserDO>().eq("mail", mail));
+        if (userList !=null && userList.size()>0){
+            return false;
+        }else {
+            return true;
+        }
     }
 
     /**
