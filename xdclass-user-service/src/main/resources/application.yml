@@ -4,7 +4,10 @@ server:
 spring:
   application:
     name: xdclass-user-service
-
+  redis:
+    host: 192.168.127.231
+    password: 123456
+    port: 8000
   #数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

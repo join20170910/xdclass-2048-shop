@@ -1,6 +1,5 @@
 package net.xdclass.controller;
 
-
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.RequestMapping;
 
