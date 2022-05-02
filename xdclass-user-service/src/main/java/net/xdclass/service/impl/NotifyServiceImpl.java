@@ -1,6 +1,7 @@
 package net.xdclass.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import net.xdclass.constant.CacheKey;
 import net.xdclass.enums.BizCodeEnum;
 import net.xdclass.enums.SendCodeEnum;
 import net.xdclass.service.IMailService;
@@ -21,6 +22,7 @@ public class NotifyServiceImpl implements INotifyService {
 
     private final String SUBJECT = "注册验证码";
     private final String CONTENT ="您的验证码是%s,有效时间是60秒,打死也不要告诉别人!";
+    private final int CODE_EXPIRED = 60 *1000 * 10;
     @Autowired
     private IMailService mailService;
 
@@ -39,11 +41,9 @@ public class NotifyServiceImpl implements INotifyService {
      * @version 1.0
      */
     @Override
-    public JsonData sendCode(SendCodeEnum sendCodeType, String to) {
-
+    public JsonData sendCode(SendCodeEnum sendCodeEnum, String to) {
 
         String cacheKey = String.format(CacheKey.CHECK_CODE_KEY,sendCodeEnum.name(),to);
-
         String cacheValue = redisTemplate.opsForValue().get(cacheKey);
 
         //如果不为空，则判断是否60秒内重复发送
@@ -76,4 +76,26 @@ public class NotifyServiceImpl implements INotifyService {
 
         return JsonData.buildResult(BizCodeEnum.CODE_TO_ERROR);
     }
+
+    /**
+     * @Description: 校验 code
+     * @Author: john
+     * @Date: 2022/5/2 15:44:24
+     * @version 1.0
+     */
+    @Override
+    public boolean checkCode(SendCodeEnum sendCodeEnum, String to, String code) {
+
+        String cacheKey = String.format(CacheKey.CHECK_CODE_KEY,sendCodeEnum.name(),to);
+        String cacheValue = redisTemplate.opsForValue().get(cacheKey);
+        if (StringUtils.isNotBlank(cacheValue)){
+            String cacheCode = cacheValue.split("_")[0];
+            if (cacheCode.equals(code)){
+                //删除验证码
+                redisTemplate.delete(cacheKey);
+                return true;
+            }
+        }
+        return false;
     }
+}

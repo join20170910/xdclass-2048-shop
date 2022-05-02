@@ -87,4 +87,8 @@ public class CommonUtil {
     }
     return stringBuilder.toString();
     }
+
+    public static long getCurrentTimestamp() {
+        return System.currentTimeMillis();
+    }
 }
