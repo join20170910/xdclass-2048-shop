@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
+import java.util.Random;
 
 public class CommonUtil {
 
@@ -69,5 +70,21 @@ public class CommonUtil {
         }
         return null;
 
+    }
+
+    /**
+     * @Description: 获取随机码
+     * @Author: john
+     * @Date: 2022/5/2 10:35:50
+     * @version 1.0
+     */
+    public static String getRandomCode(int length){
+        String sources = "0123456789";
+        Random random = new Random();
+        StringBuilder stringBuilder = new StringBuilder();
+    for (int i = 0; i < length; i++) {
+        stringBuilder.append(sources.charAt(random.nextInt(9)));
+    }
+    return stringBuilder.toString();
     }
 }
