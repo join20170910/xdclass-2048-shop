@@ -25,7 +25,7 @@ public class MailServiceImpl implements IMailService {
     private String from;
 
     @Override
-    public void sendSimpleMail(String to, String subject, String content) {
+    public void sendMail(String to, String subject, String content) {
         //创建SimpleMailMessage对象
         SimpleMailMessage message = new SimpleMailMessage();
         //邮件发送人
