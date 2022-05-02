@@ -6,12 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.xdclass.enums.BizCodeEnum;
 import net.xdclass.enums.SendCodeEnum;
 import net.xdclass.mapper.UserMapper;
+import net.xdclass.model.LoginUser;
 import net.xdclass.model.UserDO;
 import net.xdclass.request.UserLoginRequest;
 import net.xdclass.request.UserRegisterRequest;
 import net.xdclass.service.INotifyService;
 import net.xdclass.service.IUserService;
 import net.xdclass.util.CommonUtil;
+import net.xdclass.util.JWTUtil;
 import net.xdclass.util.JsonData;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.BeanUtils;
@@ -78,7 +80,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             String pwd = userDO.getPwd();
             String crypt = Md5Crypt.md5Crypt(loginRequest.getPwd().getBytes(), userDO.getSecret());
             if (pwd.equals(crypt)){
-                return JsonData.buildSuccess();
+                // 登陆成功 生成token
+                LoginUser userDTO = new LoginUser();
+                BeanUtils.copyProperties(userDO, userDTO);
+                String token = JWTUtil.geneJsonWebToken(userDTO);
+                return JsonData.buildSuccess(token);
+
+            }else {
+                return JsonData.buildResult(BizCodeEnum.ACCOUNT_PWD_ERROR);
             }
         }else {
             JsonData.buildResult(BizCodeEnum.ACCOUNT_UNREGISTER);
