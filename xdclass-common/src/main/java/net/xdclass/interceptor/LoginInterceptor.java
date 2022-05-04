@@ -33,17 +33,14 @@ try {
                     return false;
                 }
 
-                Long id = Long.valueOf( claims.get("id").toString());
+                Long userId = Long.valueOf( claims.get("id").toString());
                 String headImg = (String) claims.get("head_img");
                 String mail = (String) claims.get("mail");
                 String name = (String) claims.get("name");
 
                                 //TODO 用户信息传递
-                final LoginUser loginUser = new LoginUser();
-                loginUser.setName(name);
-                loginUser.setId(id);
-                loginUser.setMail(mail);
-                loginUser.setHeadImg(headImg);
+                final LoginUser loginUser = LoginUser.builder().headImg(headImg).name(name)
+                        .id(userId).mail(mail).build();
                 threadLocal.set(loginUser);
                 return true;
 

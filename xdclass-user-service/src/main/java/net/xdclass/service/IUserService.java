@@ -3,6 +3,7 @@ package net.xdclass.service;
 import net.xdclass.request.UserLoginRequest;
 import net.xdclass.request.UserRegisterRequest;
 import net.xdclass.util.JsonData;
+import net.xdclass.vo.UserVo;
 
 public interface IUserService {
 
@@ -16,4 +17,6 @@ public interface IUserService {
   JsonData register(UserRegisterRequest userRegisterRequest);
 
   JsonData login(UserLoginRequest loginRequest);
+
+  UserVo findUserDetail();
 }

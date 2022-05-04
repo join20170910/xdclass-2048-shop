@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import net.xdclass.enums.BizCodeEnum;
 import net.xdclass.enums.SendCodeEnum;
+import net.xdclass.interceptor.LoginInterceptor;
 import net.xdclass.mapper.UserMapper;
 import net.xdclass.model.LoginUser;
 import net.xdclass.model.UserDO;
@@ -15,6 +16,7 @@ import net.xdclass.service.IUserService;
 import net.xdclass.util.CommonUtil;
 import net.xdclass.util.JWTUtil;
 import net.xdclass.util.JsonData;
+import net.xdclass.vo.UserVo;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,5 +114,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
      */
     private void userRegisterInitTask(UserDO userDO){
 
+    }
+
+    @Override
+    public UserVo findUserDetail() {
+        final LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        final UserDO userDO = userMapper.selectOne(new QueryWrapper<UserDO>().eq("id", loginUser.getId()));
+        final UserVo userVo = new UserVo();
+        BeanUtils.copyProperties(userDO,userVo);
+        return userVo;
     }
 }
