@@ -1,6 +1,11 @@
 package net.xdclass.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
@@ -107,5 +112,20 @@ public class CommonUtil {
             saltString.append(ALL_CHAR_NUM.charAt(random.nextInt(ALL_CHAR_NUM.length())));
         }
         return saltString.toString();
+    }
+
+    /**
+     * @Description: 响应json数据给前端
+     * @Author: john
+     * @Date: 2022/5/2 21:29:13
+     * @version 1.0
+     */
+    public static void sendJsonMessage(HttpServletResponse response, JsonData buildError) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try(PrintWriter writer = response.getWriter()) {
+            writer.write(objectMapper.writeValueAsString(buildError));
+            writer.flush();
+        } catch (IOException e) {
+        }
     }
 }
